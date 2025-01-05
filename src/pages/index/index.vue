@@ -1,5 +1,10 @@
 <script setup lang="ts">
 //
+
+import { onLoad } from '@dcloudio/uni-app';
+import { ref } from 'vue';
+
+
 import { getHomeBannerAPI } from '@/services/home'
 import { getHomeCategoryAPI } from '@/services/home'
 import { getHomeHotAPI } from '@/services/home'
@@ -7,12 +12,9 @@ import { getHomeHotAPI } from '@/services/home'
 import CustomNavbar from './Compoents/CustomNavbar.vue';
 import CategoryPanel from './Compoents/CategoryPanel.vue';
 import HotPanel from './Compoents/HotPanel.vue';
+import XtxGuess from '@/components/XtxGuess.vue';
 
-
-import { onLoad } from '@dcloudio/uni-app';
-import { ref } from 'vue';
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home';
-import { resolveSoa } from 'dns';
 
 
 
@@ -51,18 +53,28 @@ onLoad(() => {
 <template>
   <!--自定义导航栏-->
   <CustomNavbar />
-  <!--自定义轮播图-->
-  <XtxSwiper :list="bannerList" />
-  <!--分类面板-->
-  <CategoryPanel :list="categoryList" />
-  <!--热门推荐-->
-  <HotPanel :list="hotlist" />
+  <scroll-view class="scroll-view" scroll-y>
+    <!--自定义轮播图-->
+    <XtxSwiper :list="bannerList" />
+    <!--分类面板-->
+    <CategoryPanel :list="categoryList" />
+    <!--热门推荐-->
+    <HotPanel :list="hotlist" />
+    <!--猜你喜欢-->
+    <XtxGuess />
+  </scroll-view>
 
-  <view class="index">index</view>
 </template>
 
 <style lang="scss">
 page {
   background-color: #f7f7f7;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.scroll-view {
+  flex: 1
 }
 </style>
