@@ -15,6 +15,10 @@ const getHomeGoodGuessLikeData = async () => {
 onMounted(() => {
     getHomeGoodGuessLikeData()
 })
+// 暴露方法
+defineExpose({
+    getMore: getHomeGoodGuessLikeData
+})
 
 </script>
 

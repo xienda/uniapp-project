@@ -15,7 +15,7 @@ import HotPanel from './Compoents/HotPanel.vue';
 import XtxGuess from '@/components/XtxGuess.vue';
 
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home';
-
+import type { XtxGuessInstance } from '@/types/component'
 
 
 // 获取轮播图数据
@@ -48,12 +48,21 @@ onLoad(() => {
   getHomeHotData()
 })
 
+// 获取猜你喜欢组件实例
+const guessRef = ref<XtxGuessInstance>()
+
+// 滚动触底
+const onScrolltolower = () => {
+  guessRef.value?.getMore()
+}
+
 </script>
 
 <template>
   <!--自定义导航栏-->
   <CustomNavbar />
-  <scroll-view class="scroll-view" scroll-y>
+  <!--滚动容器-->
+  <scroll-view @scrolltolower="onScrolltolower" class="scroll-view" scroll-y>
     <!--自定义轮播图-->
     <XtxSwiper :list="bannerList" />
     <!--分类面板-->
@@ -61,7 +70,7 @@ onLoad(() => {
     <!--热门推荐-->
     <HotPanel :list="hotlist" />
     <!--猜你喜欢-->
-    <XtxGuess />
+    <XtxGuess ref="guessRef" />
   </scroll-view>
 
 </template>
