@@ -12,3 +12,14 @@ export const getHomeBannerAPI = (distributionSite = 1) => {
 
 
 }
+
+// /home/category / mutli
+
+export const getHomeCategoryAPI = () => {
+    return http({
+        method: 'GET',
+        url: 'https://pcapi-xiaotuxian-front-devtest.itheima.net/home/category/mutli',
+
+    })
+
+}
