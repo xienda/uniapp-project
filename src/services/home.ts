@@ -1,6 +1,6 @@
 import { http } from '@/utils/http'
 import type { BannerItem, CategoryItem, GuessItem, HotItem } from '@/types/home'
-import type { PageResult } from '@/types/global'
+import type { PageParams, PageResult } from '@/types/global'
 
 
 export const getHomeBannerAPI = (distributionSite = 1) => {
@@ -36,9 +36,10 @@ export const getHomeHotAPI = () => {
 }
 
 // 猜你喜欢
-export const getHomeGoodGuessLikeAPI = () => {
+export const getHomeGoodGuessLikeAPI = (data?: PageParams) => {
     return http<PageResult<GuessItem>>({
         method: 'GET',
-        url: 'https://pcapi-xiaotuxian-front-devtest.itheima.net/home/goods/guessLike'
+        url: 'https://pcapi-xiaotuxian-front-devtest.itheima.net/home/goods/guessLike',
+        data,
     })
 }
