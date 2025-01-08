@@ -9,10 +9,11 @@ import { getHomeBannerAPI } from '@/services/home'
 import { getHomeCategoryAPI } from '@/services/home'
 import { getHomeHotAPI } from '@/services/home'
 
-import CustomNavbar from './Compoents/CustomNavbar.vue';
-import CategoryPanel from './Compoents/CategoryPanel.vue';
-import HotPanel from './Compoents/HotPanel.vue';
+import CustomNavbar from './compoents/CustomNavbar.vue';
+import CategoryPanel from './compoents/CategoryPanel.vue';
+import HotPanel from './compoents/HotPanel.vue';
 import XtxGuess from '@/components/XtxGuess.vue';
+import PageSkeleton from './compoents/PageSkeleton.vue'
 
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home';
 import type { XtxGuessInstance } from '@/types/component'
@@ -38,14 +39,18 @@ const getHomeHotData = async () => {
   const res = await getHomeHotAPI()
   hotlist.value = res.result
 }
-
+// 是否加载中标记
+const isLoading = ref(false)
 
 
 // 页面加载
-onLoad(() => {
-  getHomeBannerData()
-  getHomeCategoryData()
-  getHomeHotData()
+onLoad(async () => {
+  isLoading.value = true
+  await Promise.all([getHomeBannerData(),
+  getHomeCategoryData(),
+  getHomeHotData()])
+
+  isLoading.value = false
 })
 
 // 获取猜你喜欢组件实例
@@ -77,14 +82,19 @@ const onrefresherrefresh = async () => {
   <!--滚动容器-->
   <scroll-view refresher-enabled @refresherrefresh="onrefresherrefresh" :refresher-triggered="isTriggered"
     @scrolltolower="onScrolltolower" class="scroll-view" scroll-y>
-    <!--自定义轮播图-->
-    <XtxSwiper :list="bannerList" />
-    <!--分类面板-->
-    <CategoryPanel :list="categoryList" />
-    <!--热门推荐-->
-    <HotPanel :list="hotlist" />
-    <!--猜你喜欢-->
-    <XtxGuess ref="guessRef" />
+    <!--骨架屏-->
+    <PageSkeleton v-if="isLoading" />
+    <template v-else>
+      <!--自定义轮播图-->
+      <XtxSwiper :list="bannerList" />
+      <!--分类面板-->
+      <CategoryPanel :list="categoryList" />
+      <!--热门推荐-->
+      <HotPanel :list="hotlist" />
+      <!--猜你喜欢-->
+      <XtxGuess ref="guessRef" />
+    </template>
+
   </scroll-view>
 
 </template>
