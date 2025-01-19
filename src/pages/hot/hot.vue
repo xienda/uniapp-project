@@ -29,7 +29,7 @@ if (currHot) {
 // 推荐封面图
 const bannerPicture = ref('')
 // 推荐选项
-const subTypes = ref<SubTypeItem[]>([])
+const subTypes = ref<(SubTypeItem & { finish?: boolean })[]>([])
 // 高亮的下标
 const activeIndex = ref(0)
 
@@ -55,6 +55,16 @@ onLoad(() => {
 const onScrolltolower = async () => {
   // 获取当前选项
   const currsubTypes = subTypes.value[activeIndex.value]
+  // 分页条件
+  if (currsubTypes.goodsItems.page < currsubTypes.goodsItems.pages) {
+    currsubTypes.goodsItems.page++;
+  } else {
+    // 标记已结束
+    currsubTypes.finish = true
+    // 推出并轻提示
+    return uni.showToast({ icon: 'none', title: '没有更多数据了~' })
+  }
+
   // 当前页码累加
   currsubTypes.goodsItems.page++
   // 调用API传参
@@ -100,7 +110,7 @@ const onScrolltolower = async () => {
           </view>
         </navigator>
       </view>
-      <view class="loading-text">正在加载...</view>
+      <view class="loading-text">{{ item.finish ? '没有更多数据了~' : '正在加载...' }}</view>
     </scroll-view>
   </view>
 </template>
