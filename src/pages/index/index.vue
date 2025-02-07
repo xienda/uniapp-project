@@ -16,7 +16,8 @@ import XtxGuess from '@/components/XtxGuess.vue';
 import PageSkeleton from './compoents/PageSkeleton.vue'
 
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home';
-import type { XtxGuessInstance } from '@/types/component'
+
+import { useGuessList } from '@/composables';
 
 
 // 获取轮播图数据
@@ -53,16 +54,13 @@ onLoad(async () => {
   isLoading.value = false
 })
 
-// 获取猜你喜欢组件实例
-const guessRef = ref<XtxGuessInstance>()
-
-// 滚动触底
-const onScrolltolower = () => {
-  guessRef.value?.getMore()
-}
-const isTriggered = ref(false)
+// 猜你喜欢组合式函数调用
+const { guessRef, onScrolltolower } = useGuessList()
 
 // 自定义下拉刷新被触发
+const isTriggered = ref(false)
+
+
 const onrefresherrefresh = async () => {
   // 开始动画
   isTriggered.value = true
