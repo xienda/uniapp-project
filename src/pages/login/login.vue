@@ -2,7 +2,10 @@
 
 <script setup lang="ts">
 import { postLoginWxMinAPI, postLoginWxMinSimpleAPI } from '@/services/login';
+import { useMemberStore } from '@/stores';
+import type { LoginResult } from '@/types/member';
 import { onLoad } from '@dcloudio/uni-app';
+
 
 
 // 获取code 登录凭证
@@ -28,15 +31,30 @@ const onGetphonenumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
 
 }
 
-// 模拟手机号码快捷登录
+// 模拟手机号码快捷登录(开发练习)
 
 const onGetphonenumberSimple = async () => {
   const res = postLoginWxMinSimpleAPI('18261682039')
+  loginSuccess((await res).result)
+}
+
+const loginSuccess = (profile: LoginResult) => {
+  // 保存会员信息
+  const memberStore = useMemberStore()
+  memberStore.setProfile(profile)
+  // 成功提示
   uni.showToast({
     title: '登录成功',
-    icon: 'none',
+    icon: 'success',
     mask: true
   })
+  setTimeout(() => {
+    // 页面跳转
+    uni.switchTab({ url: '/pages/my/my' })
+  }, 500)
+
+
+
 }
 
 
