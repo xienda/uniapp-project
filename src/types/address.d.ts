@@ -16,3 +16,10 @@ export type AddressParams = {
     /** 默认地址，1为是，0为否 */
     isDefault: number
 }
+
+/** 收货地址项 */
+export type AddressItem = AddressItem & {
+    id: string
+    /** 省市区 */
+    fullLocation: string
+}
