@@ -1,6 +1,6 @@
 
 //  https://pcapi-xiaotuxian-front-devtest.itheima.net
-import type { ProfileDetail } from '@/types/member'
+import type { ProfileDetail, ProfileParams } from '@/types/member'
 import { http } from '@/utils/http'
 
 /**
@@ -10,5 +10,18 @@ export const getMemberProfileAPI = () => {
     return http<ProfileDetail>({
         method: 'GET',
         url: '/member/profile',
+    })
+}
+
+
+// 修改个人信息
+
+// /member/profile
+
+export const putMemberProfileAPI = (data: ProfileParams) => {
+    return http({
+        method: 'PUT',
+        url: '/member/profile',
+        data,
     })
 }
