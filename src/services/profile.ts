@@ -19,7 +19,7 @@ export const getMemberProfileAPI = () => {
 // /member/profile
 
 export const putMemberProfileAPI = (data: ProfileParams) => {
-    return http({
+    return http<ProfileDetail>({
         method: 'PUT',
         url: '/member/profile',
         data,

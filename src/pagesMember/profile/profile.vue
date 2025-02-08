@@ -24,6 +24,7 @@ onLoad(() => {
   getMemberProfileData()
 })
 
+
 // 修改头像
 
 const onAvatarChange = () => {
@@ -62,14 +63,18 @@ const onAvatarChange = () => {
 
 
 // 点击保存提交表单
-const onSubmit = () => {
-  const res = putMemberProfileAPI({
-    nickname: profile.value?.nickname
+const onSubmit = async () => {
+  const { nickname, gender, birthday, profession } = profile.value
+  const res = await putMemberProfileAPI({
+    nickname: profile.value?.nickname,
   })
-  uni.showToast({
-    title: '保存成功',
-    icon: 'success',
-  })
+  // 更新Store昵称
+  memberStore.profile!.nickname = res.result.nickname
+  uni.showToast({ icon: 'success', title: '保存成功' })
+  setTimeout(() => {
+    uni.navigateBack()
+  }, 400)
+  uni.navigateBack()
 }
 
 </script>
