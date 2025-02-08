@@ -5,6 +5,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
 import { useMemberStore } from '@/stores';
+import type { Gender } from '@/types/member';
 
 
 
@@ -61,12 +62,19 @@ const onAvatarChange = () => {
   })
 }
 
+// 修改性别
+const onGenderchange: UniHelper.RadioGroupOnChange = (ev) => {
+  profile.value.gender = ev.detail.value as Gender
+}
+
+
 
 // 点击保存提交表单
 const onSubmit = async () => {
   const { nickname, gender, birthday, profession } = profile.value
   const res = await putMemberProfileAPI({
     nickname: profile.value?.nickname,
+    gender: profile.value.gender
   })
   // 更新Store昵称
   memberStore.profile!.nickname = res.result.nickname
@@ -109,7 +117,7 @@ const onSubmit = async () => {
         </view>
         <view class="form-item">
           <text class="label">性别</text>
-          <radio-group>
+          <radio-group @change="onGenderchange">
             <label class="radio">
               <radio value="男" color="#27ba9b" :checked="profile?.gender === '男'" />
               男
