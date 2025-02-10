@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { getMemberAddressAPI, getMemberAddressByIdAPI, postMemberAddressAPI, putMemberAddressByIdAPI } from '@/services/address'
+import {
+  getMemberAddressByIdAPI,
+  postMemberAddressAPI,
+  putMemberAddressByIdAPI,
+} from '@/services/address'
 import { onLoad } from '@dcloudio/uni-app'
+import { ref } from 'vue'
 
 // 表单数据
 const form = ref({
@@ -28,29 +32,24 @@ const getMemberAddressByIdData = async () => {
     // 把数据合并到表单中
     Object.assign(form.value, res.result)
   }
-
 }
-// 页面加载
 
+// 页面加载
 onLoad(() => {
   getMemberAddressByIdData()
 })
-
-
 
 // 动态设置标题
 uni.setNavigationBarTitle({ title: query.id ? '修改地址' : '新建地址' })
 
 // 收集所在地区
 const onRegionChange: UniHelper.RegionPickerOnChange = (ev) => {
-  // 省市区（前端展示)
+  // 省市区(前端展示)
   form.value.fullLocation = ev.detail.value.join(' ')
-  // 省市区（后端参数）
+  // 省市区(后端参数)
   const [provinceCode, cityCode, countyCode] = ev.detail.code!
   // form.value.provinceCode = provinceCode
-  Object.assign(form.value, {
-    provinceCode, cityCode, countyCode
-  })
+  Object.assign(form.value, { provinceCode, cityCode, countyCode })
 }
 
 // 收集是否默认收货地址
@@ -59,7 +58,6 @@ const onSwitchChange: UniHelper.SwitchOnChange = (ev) => {
 }
 
 // 定义校验规则
-
 const rules: UniHelper.UniFormsRules = {
   receiver: {
     rules: [{ required: true, errorMessage: '请输入收货人姓名' }],
@@ -70,7 +68,7 @@ const rules: UniHelper.UniFormsRules = {
       { pattern: /^1[3-9]\d{9}$/, errorMessage: '手机号格式不正确' },
     ],
   },
-  fullLocation: {
+  countyCode: {
     rules: [{ required: true, errorMessage: '请选择所在地区' }],
   },
   address: {
@@ -78,9 +76,8 @@ const rules: UniHelper.UniFormsRules = {
   },
 }
 
-// 获取表单组件实例，用于调用表单方法
+// 表单组件实例
 const formRef = ref<UniHelper.UniFormsInstance>()
-
 
 // 提交表单
 const onSubmit = async () => {
@@ -106,8 +103,18 @@ const onSubmit = async () => {
   }
 }
 
-
-
+// #ifdef H5 || APP-PLUS
+const onCityChange: UniHelper.UniDataPickerOnChange = (ev) => {
+  // 省市区
+  const [province, city, county] = ev.detail.value
+  // 收集后端所需的 code 数据
+  Object.assign(form.value, {
+    provinceCode: province.value,
+    cityCode: city.value,
+    countyCode: county.value,
+  })
+}
+// #endif
 </script>
 
 <template>
@@ -122,12 +129,20 @@ const onSubmit = async () => {
         <text class="label">手机号码</text>
         <input class="input" placeholder="请填写收货人手机号码" :maxlength="11" v-model="form.contact" />
       </uni-forms-item>
-      <uni-forms-item name="fullLocation" class="form-item">
+      <uni-forms-item name="countyCode" class="form-item">
         <text class="label">所在地区</text>
-        <picker class="picker" @change="onRegionChange" mode="region" :value="form.fullLocation.split(' ')">
+        <!-- #ifdef MP-WEIXIN -->
+        <picker @change="onRegionChange" class="picker" mode="region" :value="form.fullLocation.split(' ')">
           <view v-if="form.fullLocation">{{ form.fullLocation }}</view>
           <view v-else class="placeholder">请选择省/市/区(县)</view>
         </picker>
+        <!-- #endif -->
+
+        <!-- #ifdef H5 || APP-PLUS -->
+        <uni-data-picker placeholder="请选择地址" popup-title="请选择城市" collection="opendb-city-china"
+          field="code as value, name as text" orderby="value asc" :step-searh="true" self-field="code"
+          parent-field="parent_code" @change="onCityChange" :clear-icon="false" v-model="form.countyCode" />
+        <!-- #endif -->
       </uni-forms-item>
       <uni-forms-item name="address" class="form-item">
         <text class="label">详细地址</text>
@@ -135,7 +150,7 @@ const onSubmit = async () => {
       </uni-forms-item>
       <view class="form-item">
         <label class="label">设为默认地址</label>
-        <switch class="switch" color="#27ba9b" @change="onSwitchChange" :checked="form.isDefault === 1" />
+        <switch @change="onSwitchChange" class="switch" color="#27ba9b" :checked="form.isDefault === 1" />
       </view>
     </uni-forms>
   </view>
@@ -144,6 +159,12 @@ const onSubmit = async () => {
 </template>
 
 <style lang="scss">
+// 深度选择器修改 uni-data-picker 组件样式
+:deep(.selected-area) {
+  flex: 0 1 auto;
+  height: auto;
+}
+
 page {
   background-color: #f4f4f4;
 }
@@ -159,7 +180,7 @@ page {
     display: flex;
     align-items: center;
     min-height: 96rpx;
-    padding: 25rpx 10rpx 40rpx;
+    padding: 25rpx 10rpx;
     background-color: #fff;
     font-size: 28rpx;
     border-bottom: 1rpx solid #ddd;
