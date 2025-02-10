@@ -30,3 +30,12 @@ export const getMemberAddressByIdAPI = (id: string) => {
     })
 
 }
+
+// 修改收货地址 data 表单数据（请求体参数）
+export const putMemberAddressByIdAPI = (id: string, data: AddressParams) => {
+    return http({
+        method: 'PUT',
+        url: '/member/address/${id}',
+        data,
+    })
+}
