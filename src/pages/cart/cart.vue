@@ -2,9 +2,9 @@
 
 import { useMemberStore } from '@/stores'
 import type { CartItem } from "@/types/cart"
-import { getMemberCartAPI, deleteMemberCartAPI } from '@/services/cart'
+import { getMemberCartAPI, deleteMemberCartAPI, putMemberCartBySkuIdAPI } from '@/services/cart'
 import { onShow } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 // 获取会员Store
 const memberStore = useMemberStore()
@@ -43,6 +43,12 @@ const onDeleteCart = (skuId: string) => {
       }
     },
   })
+}
+// 修改商品数量
+
+// 修改商品数量
+const onChangeCount = (ev: InputNumberBoxEvent) => {
+  putMemberCartBySkuIdAPI(ev.index, { count: ev.value })
 }
 
 
