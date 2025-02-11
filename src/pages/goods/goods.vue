@@ -1,7 +1,7 @@
 // src/pages/goods/goods.vue
 <script setup lang="ts">
 
-import type { SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
+import type { SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popupd'
 
 import { getGoodsByIdAPI } from "@/services/good";
 
@@ -13,6 +13,8 @@ import ServicePanel from "./commpoents/ServicePanel.vue"
 
 import { onLoad } from "@dcloudio/uni-app";
 import { ref } from "vue";
+import type { SkuPopupInstance } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popupd';
+import { computed } from 'vue';
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
@@ -29,7 +31,7 @@ const getGoodsByIdData = async () => {
   goods.value = res.result
   // SKU 组件所需格式
   localdata.value = {
-    id: res.result.id,
+    _id: res.result.id,
     name: res.result.name,
     goods_thumb: res.result.mainPictures[0],
     spec_list: res.result.specs.map(v => {
@@ -108,6 +110,12 @@ const openSkuPopup = (val: SKuMode) => {
   mode.value = val
 }
 
+// SKU组件实例
+const skuPopupRef = ref<SkuPopupInstance>()
+// 计算被选中的值
+const selectArrText = computed(() => {
+  return skuPopupRef.value?.selectArr?.join(' ').trim() || '请选择商品规格'
+})
 
 
 </script>
@@ -153,7 +161,7 @@ const openSkuPopup = (val: SKuMode) => {
       <view class="action">
         <view class="item arrow">
           <text @tap="$event => openSkuPopup(SKuMode.Both)" class="label">选择</text>
-          <text class="text ellipsis"> 请选择商品规格 </text>
+          <text class="text ellipsis"> {{ selectArrText }}</text>
         </view>
         <view @tap="openPopup('address')" class="item arrow">
           <text class="label">送至</text>
