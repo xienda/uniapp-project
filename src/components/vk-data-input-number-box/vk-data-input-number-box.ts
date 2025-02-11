@@ -1,4 +1,4 @@
-import { Component } from '@uni-helper/uni-app-types'
+import type { Component } from '@uni-helper/uni-app-types'
 
 /** 步进器 */
 export type InputNumberBox = Component<InputNumberBoxProps>

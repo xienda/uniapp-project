@@ -3,11 +3,11 @@ import CartMain from './components/CartMain.vue'
 </script>
 
 <template>
-  <CartMain />
+    <CartMain />
 </template>
 
 <style lang="scss">
 page {
-  height: 100%;
+    height: 100%;
 }
 </style>
