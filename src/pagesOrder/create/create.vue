@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { getMemberOrderPreAPI, getMemberOrderPreNowAPI } from '@/services/order'
-import { computed, ref } from 'vue'
+import {
+  getMemberOrderPreAPI,
+  getMemberOrderPreNowAPI,
+  getMemberOrderRepurchaseByIdAPI,
+  postMemberOrderAPI,
+} from '@/services/order'
+import { useAddressStore } from '@/stores/modules/address'
 import type { OrderPreResult } from '@/types/order'
 import { onLoad } from '@dcloudio/uni-app'
-import { useAddressStore } from '@/stores/modules/address'
+import { computed, ref } from 'vue'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -25,50 +30,67 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
 }
 
 // 页面参数
-
 const query = defineProps<{
-  skuId?: string,
+  skuId?: string
   count?: string
+  orderId?: string
 }>()
-
 
 // 获取订单信息
 const orderPre = ref<OrderPreResult>()
 const getMemberOrderPreData = async () => {
   if (query.count && query.skuId) {
-    const res = await getMemberOrderPreNowAPI({ count: query.count, skuId: query.skuId })
+    const res = await getMemberOrderPreNowAPI({
+      count: query.count,
+      skuId: query.skuId,
+    })
+    orderPre.value = res.result
+  } else if (query.orderId) {
+    // 再次购买
+    const res = await getMemberOrderRepurchaseByIdAPI(query.orderId)
     orderPre.value = res.result
   } else {
     const res = await getMemberOrderPreAPI()
     orderPre.value = res.result
   }
-
 }
-
-
-
 
 onLoad(() => {
   getMemberOrderPreData()
 })
 
-
-
 const addressStore = useAddressStore()
-
 // 收货地址
-const selectAddress = computed(() => {
-  return addressStore.selectedAddress || orderPre.value?.userAddresses.find(v => v.isDefault)
+const selecteAddress = computed(() => {
+  return addressStore.selectedAddress || orderPre.value?.userAddresses.find((v) => v.isDefault)
 })
 
+// 提交订单
+const onOrderSubmit = async () => {
+  // 没有收货地址提醒
+  if (!selecteAddress.value?.id) {
+    return uni.showToast({ icon: 'none', title: '请选择收货地址' })
+  }
+  // 发送请求
+  const res = await postMemberOrderAPI({
+    addressId: selecteAddress.value?.id,
+    buyerMessage: buyerMessage.value,
+    deliveryTimeType: activeDelivery.value.type,
+    goods: orderPre.value!.goods.map((v) => ({ count: v.count, skuId: v.skuId })),
+    payChannel: 2,
+    payType: 1,
+  })
+  // 关闭当前页面，跳转到订单详情，传递订单id
+  uni.redirectTo({ url: `/pagesOrder/detail/detail?id=${res.result.id}` })
+}
 </script>
 
 <template>
   <scroll-view enable-back-to-top scroll-y class="viewport">
     <!-- 收货地址 -->
-    <navigator v-if="selectAddress" class="shipment" hover-class="none" url="/pagesMember/address/address?from=order">
-      <view class="user"> {{ selectAddress.receiver }}{{ selectAddress.contact }}</view>
-      <view class="address">{{ selectAddress.fullLocation }}{{ selectAddress.address }} </view>
+    <navigator v-if="selecteAddress" class="shipment" hover-class="none" url="/pagesMember/address/address?from=order">
+      <view class="user"> {{ selecteAddress.receiver }} {{ selecteAddress.contact }} </view>
+      <view class="address"> {{ selecteAddress.fullLocation }} {{ selecteAddress.address }} </view>
       <text class="icon icon-right"></text>
     </navigator>
     <navigator v-else class="shipment" hover-class="none" url="/pagesMember/address/address?from=order">
@@ -125,7 +147,9 @@ const selectAddress = computed(() => {
     <view class="total-pay symbol">
       <text class="number">{{ orderPre?.summary.totalPayPrice.toFixed(2) }}</text>
     </view>
-    <view class="button" :class="{ disabled: true }"> 提交订单 </view>
+    <view class="button" :class="{ disabled: !selecteAddress?.id }" @tap="onOrderSubmit">
+      提交订单
+    </view>
   </view>
 </template>
 
