@@ -1,10 +1,24 @@
 <script setup lang="ts">
-
+import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/vk-data-input-number-box'
+import { useGuessList } from '@/composables'
+import {
+  deleteMemberCartAPI,
+  getMemberCartAPI,
+  putMemberCartBySkuIdAPI,
+  putMemberCartSelectedAPI,
+} from '@/services/cart'
 import { useMemberStore } from '@/stores'
-import type { CartItem } from "@/types/cart"
-import { getMemberCartAPI, deleteMemberCartAPI, putMemberCartBySkuIdAPI, putMemberCartSelectedAPI } from '@/services/cart'
+import type { CartItem } from '@/types/cart'
 import { onShow } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
+
+// 是否适配底部安全区域
+defineProps<{
+  safeAreaInsetBottom?: boolean
+}>()
+
+// 获取屏幕边界到安全区域距离
+const { safeAreaInsets } = uni.getSystemInfoSync()
 
 // 获取会员Store
 const memberStore = useMemberStore()
@@ -27,8 +41,6 @@ onShow(() => {
 })
 
 // 点击删除按钮
-
-// 点击删除按钮
 const onDeleteCart = (skuId: string) => {
   // 弹窗二次确认
   uni.showModal({
@@ -44,7 +56,6 @@ const onDeleteCart = (skuId: string) => {
     },
   })
 }
-// 修改商品数量
 
 // 修改商品数量
 const onChangeCount = (ev: InputNumberBoxEvent) => {
@@ -74,8 +85,6 @@ const onChangeSelectedAll = () => {
   })
   // 后端数据更新
   putMemberCartSelectedAPI({ selected: _isSelectedAll })
-
-
 }
 
 // 计算选中单品列表
@@ -90,7 +99,9 @@ const selectedCartListCount = computed(() => {
 
 // 计算选中总金额
 const selectedCartListMoney = computed(() => {
-  return selectedCartList.value.reduce((sum, item) => sum + item.count * item.nowPrice, 0).toFixed(2)
+  return selectedCartList.value
+    .reduce((sum, item) => sum + item.count * item.nowPrice, 0)
+    .toFixed(2)
 })
 
 // 结算按钮
@@ -98,19 +109,19 @@ const gotoPayment = () => {
   if (selectedCartListCount.value === 0) {
     return uni.showToast({
       icon: 'none',
-      title: '请选择商品'
+      title: '请选择商品',
     })
   }
   // 跳转到结算页
-  uni.showToast({ title: '等待完成' })
-
-
+  uni.navigateTo({ url: '/pagesOrder/create/create' })
 }
 
+// 猜你喜欢
+const { guessRef, onScrolltolower } = useGuessList()
 </script>
 
 <template>
-  <scroll-view scroll-y class="scroll-view">
+  <scroll-view enable-back-to-top scroll-y class="scroll-view" @scrolltolower="onScrolltolower">
     <!-- 已登录: 显示购物车 -->
     <template v-if="memberStore.profile">
       <!-- 购物车列表 -->
@@ -142,7 +153,6 @@ const gotoPayment = () => {
                   @change="onChangeCount" />
               </view>
             </view>
-
             <!-- 右侧删除按钮 -->
             <template #right>
               <view class="cart-swipe-right">
@@ -156,20 +166,20 @@ const gotoPayment = () => {
       <view class="cart-blank" v-else>
         <image src="/static/images/blank_cart.png" class="image" />
         <text class="text">购物车还是空的，快来挑选好货吧</text>
-        <navigator open-type="switchTab" url="/pages/index/index" hover-class="none">
+        <navigator url="/pages/index/index" hover-class="none">
           <button class="button">去首页看看</button>
         </navigator>
       </view>
       <!-- 吸底工具栏 -->
-      <view class="toolbar">
+      <view v-if="showCartList" class="toolbar"
+        :style="{ paddingBottom: safeAreaInsetBottom ? safeAreaInsets?.bottom + 'px' : 0 }">
         <text @tap="onChangeSelectedAll" class="all" :class="{ checked: isSelectedAll }">全选</text>
         <text class="text">合计:</text>
         <text class="amount">{{ selectedCartListMoney }}</text>
         <view class="button-grounp">
           <view @tap="gotoPayment" class="button payment-button" :class="{ disabled: selectedCartListCount === 0 }">
-            去结算({{
-              selectedCartListCount
-            }}) </view>
+            去结算({{ selectedCartListCount }})
+          </view>
         </view>
       </view>
     </template>
@@ -181,7 +191,7 @@ const gotoPayment = () => {
       </navigator>
     </view>
     <!-- 猜你喜欢 -->
-    <XtxGuess ref="guessRef"></XtxGuess>
+    <XtxGuess ref="guessRef" />
     <!-- 底部占位空盒子 -->
     <view class="toolbar-height"></view>
   </scroll-view>
@@ -200,6 +210,7 @@ const gotoPayment = () => {
 // 滚动容器
 .scroll-view {
   flex: 1;
+  background-color: #f7f7f8;
 }
 
 // 购物车列表
@@ -397,7 +408,7 @@ const gotoPayment = () => {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: var(--window-bottom);
+  bottom: calc(var(--window-bottom));
   z-index: 1;
 
   height: 100rpx;
