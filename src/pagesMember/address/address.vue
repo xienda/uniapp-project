@@ -33,6 +33,8 @@ const onDeleteAddress = (id: string) => {
   })
 }
 
+
+
 // 修改收货地址
 const onChangeAddress = (item: AddressItem) => {
   // 修改地址
@@ -41,6 +43,9 @@ const onChangeAddress = (item: AddressItem) => {
   // 返回上一页
   uni.navigateBack()
 }
+
+
+
 </script>
 
 <template>
