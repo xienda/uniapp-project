@@ -17,6 +17,7 @@ import { onLoad } from "@dcloudio/uni-app";
 import { ref } from "vue";
 import type { SkuPopupInstance } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popupd';
 import { computed } from 'vue';
+
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
@@ -128,6 +129,14 @@ const onAddCart = async (ev: SkuPopupEvent) => {
   isShowSku.value = false
 }
 
+
+
+// 立即购买
+const onBuyNow = (ev: SkuPopupEvent) => {
+  uni.navigateTo({ url: `/pagesOrder/create/create?skuId=${ev._id}&count=${ev.buy_num}` })
+}
+
+
 </script>
 
 <template>
@@ -138,7 +147,7 @@ const onAddCart = async (ev: SkuPopupEvent) => {
       color: '#27BA9B',
       borderColor: '#27BA9B',
       backgroundColor: '#E9F8F5',
-    }" @add-cart="onAddCart" />
+    }" @add-cart="onAddCart" @buy-now="onBuyNow" />
 
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
