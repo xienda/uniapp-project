@@ -85,6 +85,13 @@ onLoad(() => {
   getMemberOrderByIdData()
 })
 
+// 倒计时结束组件
+
+const onTimecp = () => {
+  // 修改订单状态为取消
+  order.value!.orderState = OrderState.YiQuXiao
+}
+
 </script>
 
 
@@ -109,7 +116,8 @@ onLoad(() => {
           <view class="tips">
             <text class="money">应付金额: ¥ 99.00</text>
             <text class="time">支付剩余</text>
-            00 时 29 分 59 秒
+            <uni-countdown :second="order.countdown" color="#fff" splitor-color="#fff" :show-day="false"
+              :show-colon="false" @timeup="onTimecp" />
           </view>
           <view class="button">去支付</view>
         </template>
