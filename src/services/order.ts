@@ -56,6 +56,6 @@ export const getMemberOrderRepurchaseByIdAPI = (id: string) => {
 export const getMemberOrderByIdAPI = (id: string) => {
     return http<OrderResult>({
         method: 'GET',
-        url: '/member/order/${id}',
+        url: `/member/order/${id}`,
     })
 }
