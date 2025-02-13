@@ -1,9 +1,13 @@
 {
+	// 组件自动引入规则
 	"easycom": {
+		// 是否开启自动扫描
 		"autoscan": true,
+		// 以正则方式自定义组件匹配规则
 		"custom": {
+			// uni-ui 规则如下配置
 			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
-			// 以Xtx开头的组件，在compents文件夹中查找
+			// 以 Xtx 开头的组件，在 components 文件夹中查找引入（需要重启服务器）
 			"^Xtx(.*)": "@/components/Xtx$1.vue"
 		}
 	},
@@ -18,11 +22,9 @@
 			}
 		},
 		{
-			"path": "pages/my/my",
+			"path": "pages/category/category",
 			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTextStyle": "white",
-				"navigationBarTitleText": "我的"
+				"navigationBarTitleText": "商品分类"
 			}
 		},
 		{
@@ -38,9 +40,11 @@
 			}
 		},
 		{
-			"path": "pages/category/category",
+			"path": "pages/my/my",
 			"style": {
-				"navigationBarTitleText": "分类"
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white",
+				"navigationBarTitleText": "我的"
 			}
 		},
 		{
@@ -119,7 +123,7 @@
 					"style": {
 						"navigationStyle": "custom",
 						"navigationBarTextStyle": "white",
-						"navigationBarTitleText": "个人信息页"
+						"navigationBarTitleText": "个人信息"
 					}
 				},
 				{
@@ -155,13 +159,19 @@
 				{
 					"path": "payment/payment",
 					"style": {
-						"navigationBarTitleText": "支付结果页"
+						"navigationBarTitleText": "支付结果"
+					}
+				},
+				{
+					"path": "list/list",
+					"style": {
+						"navigationBarTitleText": "订单列表"
 					}
 				}
 			]
 		}
 	],
-	// 分包预下载
+	// 分包预下载规则
 	"preloadRule": {
 		"pages/my/my": {
 			"network": "all",
